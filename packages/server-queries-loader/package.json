@@ -1,0 +1,32 @@
+{
+  "name": "server-queries-loader",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit"
+  },
+  "main": "./dist/loader.js",
+  "types": "./dist/loader.d.ts",
+  "dependencies": {
+    "@babel/generator": "^7.27.0",
+    "@babel/parser": "^7.27.0"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.27.0",
+    "@types/babel__generator": "^7.27.0",
+    "@types/node": "^22.14.1",
+    "eslint": "^9.21.0",
+    "eslint-config": "workspace:*",
+    "typescript": "^5.8.2",
+    "typescript-config": "workspace:*",
+    "webpack": "^5.99.6"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "dist"
+  ]
+}

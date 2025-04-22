@@ -7,6 +7,9 @@
     "./lib": {
       "import": "./base.mjs"
     },
+    "./typescript": {
+      "import": "./typescript.mjs"
+    },
     "./react": {
       "import": "./react.mjs"
     }
