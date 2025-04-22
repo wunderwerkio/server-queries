@@ -45,5 +45,11 @@
   },
   "peerDependencies": {
     "react": "^19.0.0"
-  }
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "dist"
+  ]
 }
