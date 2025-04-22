@@ -1,0 +1,69 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1735563628,
+        "narHash": "sha256-OnSAY7XDSx7CtDoqNh8jwVwh4xNL/2HaJxGjryLWzX8=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "b134951a4c9f3c995fd7be05f3243f8ecd65d798",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-24.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "ww-node-overlays": "ww-node-overlays",
+        "ww-utils": "ww-utils"
+      }
+    },
+    "ww-node-overlays": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1735913005,
+        "narHash": "sha256-upU1jZ/sDwRbCmZetF+u2Pi/oKpfFfBPpDo67iq1Mb8=",
+        "owner": "wunderwerkio",
+        "repo": "nix-node-packages-overlays",
+        "rev": "d49bca2fc8345e663e54d93a9ee6dde90defad1e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wunderwerkio",
+        "repo": "nix-node-packages-overlays",
+        "type": "github"
+      }
+    },
+    "ww-utils": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1726662452,
+        "narHash": "sha256-1m8Wif735KirbawhXUXCeeWOHmyPilDfNVbtYP7PKLY=",
+        "owner": "wunderwerkio",
+        "repo": "nix-ww-utils",
+        "rev": "62f9a98dd305d26670be07aeff530399863e69fd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wunderwerkio",
+        "repo": "nix-ww-utils",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

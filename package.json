@@ -1,0 +1,23 @@
+{
+  "name": "root",
+  "version": "0.0.0",
+  "private": true,
+  "devDependencies": {
+    "@changesets/cli": "^2.29.2",
+    "@changesets/git": "^3.0.4",
+    "prettier-config": "workspace:*",
+    "turbo": "^2.5.0"
+  },
+  "scripts": {
+    "check-all": "turbo run build lint typecheck && pnpm format:check",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format:check": "prettier --check 'packages/*/**/*.{ts,tsx,mjs,js}'",
+    "format:write": "prettier --write 'packages/*/**/*.{ts,tsx,mjs,js}'",
+    "version-packages": "turbo run build lint typecheck && changeset version && pnpm install --lockfile-only",
+    "publish-packages": "turbo run build lint typecheck && changeset publish"
+  },
+  "packageManager": "pnpm@9.15.2"
+}

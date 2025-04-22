@@ -1,0 +1,28 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "tasks": {
+    "build": {
+      "inputs": ["src/**/*.ts", "src/**/*.tsx"],
+      "outputs": [
+        "dist/**"
+      ]
+    },
+    "lint": {
+      "inputs": ["src/**/*.ts", "src/**/*.tsx"],
+      "outputs": []
+    },
+    "typecheck": {
+      "inputs": ["src/**/*.ts", "src/**/*.tsx"],
+      "outputs": []
+    },
+    "test": {
+      "inputs": ["src/**/*.ts", "src/**/*.tsx"],
+      "outputs": []
+    },
+    "format:check": {
+      "inputs": ["src/**/*.ts", "src/**/*.tsx"],
+      "outputs": []
+    }
+  },
+  "globalEnv": ["NODE_ENV"]
+}
