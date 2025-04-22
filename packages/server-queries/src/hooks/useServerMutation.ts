@@ -14,7 +14,7 @@ type Options<TResult extends ServerQueryResult> = {
   /** Callback function invoked when the mutation fails. */
   onError?: (
     firstError: ExtractErr<TResult>[number],
-    errors: ExtractErr<TResult>
+    errors: ExtractErr<TResult>,
   ) => void | Promise<void>;
 };
 
@@ -35,7 +35,7 @@ type Options<TResult extends ServerQueryResult> = {
 export function useServerMutation<TInput, TResult extends ServerQueryResult>(
   mutation: ServerQueryFunction<TInput, TResult>,
   options: Options<TResult> = {},
-  deps: DependencyList = []
+  deps: DependencyList = [],
 ) {
   const [isPending, startTransition] = useTransition();
   const config = useServerQueryConfig();
@@ -43,7 +43,7 @@ export function useServerMutation<TInput, TResult extends ServerQueryResult>(
   // Safety check.
   if (mutation.type !== "mutation") {
     throw new Error(
-      "useServerMutation can only be used with server mutations!"
+      "useServerMutation can only be used with server mutations!",
     );
   }
 
@@ -65,12 +65,12 @@ export function useServerMutation<TInput, TResult extends ServerQueryResult>(
             config.logger.error(
               `Error fetching data for server mutation (${mutation.id}):`,
               result.val[0].title,
-              result.val[0].detail
+              result.val[0].detail,
             );
 
             await options.onError?.(
               result.val[0],
-              result.val as ExtractErr<TResult>
+              result.val as ExtractErr<TResult>,
             );
             // eslint-disable-next-line
             reject(result.val as ExtractErr<TResult>);
@@ -79,7 +79,7 @@ export function useServerMutation<TInput, TResult extends ServerQueryResult>(
       });
     },
     // eslint-disable-next-line
-    [startTransition, mutation, isPending, options, ...deps]
+    [startTransition, mutation, isPending, options, ...deps],
   );
 
   return [callback, isPending] as const;

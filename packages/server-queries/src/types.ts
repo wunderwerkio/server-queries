@@ -49,7 +49,10 @@ export type ServerQueryCaller<
   ? (input: TInput) => Promise<ValidationError | TResult>
   : () => Promise<ValidationError | TResult>;
 
-export interface ServerQuerySerializer<TInput, TResult extends ServerQueryResult> {
+export interface ServerQuerySerializer<
+  TInput,
+  TResult extends ServerQueryResult,
+> {
   serializeInput(input: TInput): string;
   serializeResult(input: TResult | ValidationError): string;
   deserializeInput(input: string): TInput;

@@ -24,12 +24,12 @@ export function serverQuery<
 >(
   id: string,
   schema: TSchema,
-  callback: (input: z.infer<TSchema>) => TReturn
+  callback: (input: z.infer<TSchema>) => TReturn,
 ): {
   id: string;
   type: "query";
   func: (
-    input: z.infer<TSchema>
+    input: z.infer<TSchema>,
   ) => Promise<Awaited<TReturn> | ValidationError>;
 };
 
@@ -48,7 +48,7 @@ export function serverQuery<
  */
 export function serverQuery<TReturn extends PromiseLike<ServerQueryResult>>(
   id: string,
-  callback: () => TReturn
+  callback: () => TReturn,
 ): {
   id: string;
   type: "query";
@@ -73,7 +73,7 @@ export function serverQuery<TReturn extends PromiseLike<ServerQueryResult>>(
 export function serverQuery<TReturn extends PromiseLike<ServerQueryResult>>(
   id: string,
   schemaOrCallback: ZodSchema | (() => PromiseLike<TReturn>),
-  callback?: (data: unknown) => PromiseLike<TReturn>
+  callback?: (data: unknown) => PromiseLike<TReturn>,
 ) {
   if (typeof schemaOrCallback === "function") {
     return {
@@ -92,7 +92,7 @@ export function serverQuery<TReturn extends PromiseLike<ServerQueryResult>>(
         // eslint-disable-next-line
         console.error(
           "[Server Query] Validation failed:",
-          validationResult.error.toString()
+          validationResult.error.toString(),
         );
 
         // Properly map zod errors to the ServerActionError format.

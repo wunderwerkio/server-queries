@@ -16,8 +16,8 @@ import { ExtractOk, ServerQueryFunction } from "../types";
 /**
  * Hook to query data via `useQuery` from a server query.
  *
- * This hook wraps `useQuery` and supplies a custom `queryFn` that invokes 
- * the server query to fetch the data. The query result is automatically 
+ * This hook wraps `useQuery` and supplies a custom `queryFn` that invokes
+ * the server query to fetch the data. The query result is automatically
  * type-safe based on the server query's return type.
  *
  * ### Key features:

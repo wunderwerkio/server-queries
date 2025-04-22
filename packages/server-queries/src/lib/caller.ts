@@ -8,16 +8,16 @@ import { createJsonSerializer } from "./serializer";
 
 /**
  * Creates a caller function that executes server queries and mutations.
- * 
+ *
  * Creates a type-safe function that handles serialization, HTTP requests,
  * and deserialization of server query/mutation results.
- * 
+ *
  * ### Key features:
  * - Handles both query (GET) and mutation (POST) requests.
  * - Automatically serializes input and deserializes results.
  * - Configurable fetch options and base path.
  * - Type-safe input and result handling.
- * 
+ *
  * @param query - The server query/mutation to create a caller for.
  * @param fetchOptions - Additional options to pass to fetch.
  * @param options - Configuration for the server query caller.

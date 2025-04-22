@@ -5,7 +5,7 @@ import type webpack from "webpack";
 
 /**
  * Webpack loader that transforms server query imports.
- * 
+ *
  * Note: This loader works with turbopack!
  *
  * This loader processes import statements with server query attributes and transforms them
@@ -62,28 +62,28 @@ export default function loader(this: LoaderThis<unknown>, source: string) {
               attr.key?.type === "Identifier" &&
               attr.key.name === "type" &&
               attr.value?.value === "server-query") ||
-            attr.value?.value === "server-mutation"
+            attr.value?.value === "server-mutation",
         )
       ) {
         const id = node.attributes?.find(
           (attr) =>
             attr.type === "ImportAttribute" &&
             attr.key?.type === "Identifier" &&
-            attr.key.name === "id"
+            attr.key.name === "id",
         )?.value.value;
 
         const type = node.attributes?.find(
           (attr) =>
             attr.type === "ImportAttribute" &&
             attr.key?.type === "Identifier" &&
-            attr.key.name === "type"
+            attr.key.name === "type",
         )?.value.value;
 
         if (type !== "server-query" && type !== "server-mutation") {
           this.emitError(
             new Error(
-              `Server query type ${type} is not supported. Only "server-query" and "server-mutation" are supported.`
-            )
+              `Server query type ${type} is not supported. Only "server-query" and "server-mutation" are supported.`,
+            ),
           );
 
           continue;
@@ -92,8 +92,8 @@ export default function loader(this: LoaderThis<unknown>, source: string) {
         if (!id) {
           this.emitError(
             new Error(
-              `Server query import must specify it's ID in the with clause.`
-            )
+              `Server query import must specify it's ID in the with clause.`,
+            ),
           );
 
           continue;
@@ -104,12 +104,12 @@ export default function loader(this: LoaderThis<unknown>, source: string) {
 
         const hasNamedImport =
           node.specifiers.findIndex(
-            (spec) => spec.type === "ImportSpecifier"
+            (spec) => spec.type === "ImportSpecifier",
           ) !== -1;
 
         if (hasNamedImport) {
           const namedSpec = node.specifiers.find(
-            (spec) => spec.type === "ImportSpecifier"
+            (spec) => spec.type === "ImportSpecifier",
           );
           if (!namedSpec) {
             continue;
@@ -140,7 +140,7 @@ export default function loader(this: LoaderThis<unknown>, source: string) {
     {
       retainLines: true,
     },
-    source
+    source,
   );
 
   for (const [name, { id, type }] of transformedServerQueryImports.entries()) {

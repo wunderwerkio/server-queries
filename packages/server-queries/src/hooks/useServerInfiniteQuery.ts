@@ -22,7 +22,7 @@ type ExtractOk<T> = T extends {
 /**
  * Hook to query data via `useInfiniteQuery` from a server query.
  *
- * This hook wraps `useInfiniteQuery` and supplies a custom `queryFn` that invokes 
+ * This hook wraps `useInfiniteQuery` and supplies a custom `queryFn` that invokes
  * the server query to fetch the data. The page params are passed to the server query
  * through the `prepareQueryFn` option, which creates the server query input object.
  *

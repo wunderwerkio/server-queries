@@ -45,7 +45,7 @@ const defaultOptions: Options = {
  */
 export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
   queries: ServerQueryFunction<TInput, TResult>[],
-  options?: Partial<Options>
+  options?: Partial<Options>,
 ) {
   const mergedOptions = { ...defaultOptions, ...options };
   const serializer = createJsonSerializer<TInput, TResult>();
@@ -56,7 +56,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
     if (!payload) {
       mergedOptions.logger.error(
         "Error handling server query request: No payload found in URL!",
-        request.url
+        request.url,
       );
 
       return createErrorResponse({
@@ -70,7 +70,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
     if (!id) {
       mergedOptions.logger.error(
         "Error handling server query request: No query ID found in URL!",
-        request.url
+        request.url,
       );
 
       return createErrorResponse({
@@ -87,7 +87,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
       if (!query) {
         mergedOptions.logger.error(
           "Error handling server query request: No matching query found for ID:",
-          id
+          id,
         );
 
         return createErrorResponse({
@@ -99,7 +99,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
 
       if (query.type !== "query") {
         mergedOptions.logger.error(
-          `Error handling server query request: Query with id ${id} is not a query, instead has type: ${query.type}!`
+          `Error handling server query request: Query with id ${id} is not a query, instead has type: ${query.type}!`,
         );
 
         return createErrorResponse({
@@ -116,7 +116,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
       mergedOptions.logger.error(
         "Error handling server query request:",
         e,
-        request.url
+        request.url,
       );
 
       return createErrorResponse({
@@ -153,7 +153,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
       if (!query) {
         mergedOptions.logger.error(
           "Error handling server query request: No matching query found for ID:",
-          id
+          id,
         );
 
         return createErrorResponse({
@@ -165,7 +165,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
 
       if (query.type !== "mutation") {
         mergedOptions.logger.error(
-          `Error handling server query request: Query with id ${id} is not a mutation, instead has type: ${query.type}!`
+          `Error handling server query request: Query with id ${id} is not a mutation, instead has type: ${query.type}!`,
         );
 
         return createErrorResponse({
@@ -182,7 +182,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
       mergedOptions.logger.error(
         "Error handling server query request:",
         err,
-        request.url
+        request.url,
       );
 
       return createErrorResponse({

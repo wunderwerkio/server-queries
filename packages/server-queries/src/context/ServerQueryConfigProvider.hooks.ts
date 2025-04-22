@@ -4,7 +4,7 @@ import { ServerQueryConfigContext } from "./ServerQueryConfigProvider.client";
 
 /**
  * Hook to access the server query configuration from context.
- * 
+ *
  * @throws {Error} If used outside of a ServerQueryConfigProvider.
  */
 export function useServerQueryConfig() {

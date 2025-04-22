@@ -12,7 +12,7 @@ export const defaultServerQueryConfig: ServerQueryConfig = {
 
 /** Context for sharing server query configuration. */
 export const ServerQueryConfigContext = createContext<ServerQueryConfig>(
-  defaultServerQueryConfig
+  defaultServerQueryConfig,
 );
 
 /** Props for the ServerQueryConfigProvider component. */
