@@ -6,7 +6,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
-  target: "es6",
+  target: "node16",
   format: "cjs",
   dts: true,
 });

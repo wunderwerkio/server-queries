@@ -3,6 +3,14 @@ import * as parser from "@babel/parser";
 import { type Node } from "@babel/types";
 import type webpack from "webpack";
 
+type LoaderOptions = {
+  debug: boolean;
+};
+
+const defaultOptions: LoaderOptions = {
+  debug: false,
+};
+
 /**
  * Webpack loader that transforms server query imports.
  *
@@ -28,7 +36,12 @@ import type webpack from "webpack";
  * @param source - The source code content of the module being loaded.
  * @throws {Error} If invalid import attributes are found.
  */
-export default function loader(this: LoaderThis<unknown>, source: string) {
+export default function loader(
+  this: LoaderThis<LoaderOptions>,
+  source: string,
+) {
+  const options = { ...defaultOptions, ...(this.getOptions() ?? {}) };
+
   // First quick check.
   if (!source.includes("server-query") && !source.includes("server-mutation")) {
     return source;
@@ -40,6 +53,12 @@ export default function loader(this: LoaderThis<unknown>, source: string) {
   if (!/import[^;]*with[\s\n]*{.*}/.test(singleLineSource)) {
     return source;
   }
+
+  logDebug(
+    options.debug,
+    "Rewriting server query / mutation imports in:",
+    this.resourcePath,
+  );
 
   // Parse the source code into an AST.
   const ast = parser.parse(source, {
@@ -211,3 +230,16 @@ export type LoaderThis<Options> = {
    */
   rootContext: string;
 };
+
+/**
+ * Helper function for debug logging in the loader.
+ * Only logs if the debug flag is enabled.
+ *
+ * @param flag - Debug flag that controls whether logging is enabled
+ * @param args - Arguments to pass to console.log
+ */
+function logDebug(flag: boolean, ...args: unknown[]) {
+  if (flag) {
+    console.log(...args);
+  }
+}
