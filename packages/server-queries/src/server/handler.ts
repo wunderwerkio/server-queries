@@ -43,12 +43,14 @@ const defaultOptions: Options = {
  * @param options - Configuration options for the handler.
  * @throws {Error} If request validation fails or query execution errors.
  */
-export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
-  queries: ServerQueryFunction<TInput, TResult>[],
+export function createRouteHandler(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  queries: ServerQueryFunction<any, ServerQueryResult>[],
   options?: Partial<Options>,
 ) {
   const mergedOptions = { ...defaultOptions, ...options };
-  const serializer = createJsonSerializer<TInput, TResult>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const serializer = createJsonSerializer<any, ServerQueryResult>();
 
   const handleGet = async (request: NextRequest) => {
     const params = new URLSearchParams(request.url.split("?")[1]);
@@ -81,6 +83,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const input = serializer.deserializeInput(payload);
 
       const query = queries.find((query) => query.id === id);
@@ -147,6 +150,7 @@ export function createRouteHandler<TInput, TResult extends ServerQueryResult>(
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const input = serializer.deserializeInput(payload);
 
       const query = queries.find((query) => query.id === id);
