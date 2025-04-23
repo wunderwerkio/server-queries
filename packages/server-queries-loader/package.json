@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "lint": "eslint src",
     "typecheck": "tsc --project ./tsconfig.json --noEmit"
   },
-  "main": "./dist/loader.js",
-  "types": "./dist/loader.d.ts",
+  "main": "./dist/loader.cjs",
+  "types": "./dist/loader.d.cts",
   "dependencies": {
     "@babel/generator": "^7.27.0",
     "@babel/parser": "^7.27.0"
@@ -19,6 +19,7 @@
     "@types/node": "^22.14.1",
     "eslint": "^9.21.0",
     "eslint-config": "workspace:*",
+    "tsup": "^8.4.0",
     "typescript": "^5.8.2",
     "typescript-config": "workspace:*",
     "webpack": "^5.99.6"

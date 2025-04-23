@@ -120,6 +120,9 @@ importers:
       eslint-config:
         specifier: workspace:*
         version: link:../config/eslint
+      tsup:
+        specifier: ^8.4.0
+        version: 8.4.0(typescript@5.8.3)
       typescript:
         specifier: ^5.8.2
         version: 5.8.3
