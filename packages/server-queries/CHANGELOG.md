@@ -1,5 +1,11 @@
 # server-queries
 
+## 0.1.3
+
+### Patch Changes
+
+- 98c4517: Fix the types for createRouteHandler to not error when adding multiple different queries
+
 ## 0.1.2
 
 ### Patch Changes
