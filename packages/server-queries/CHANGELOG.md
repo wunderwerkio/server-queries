@@ -1,5 +1,11 @@
 # server-queries
 
+## 0.1.4
+
+### Patch Changes
+
+- 7e0734e: Do not add input payload in caller if input is undefined
+
 ## 0.1.3
 
 ### Patch Changes
