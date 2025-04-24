@@ -31,14 +31,20 @@ export function createCaller<TInput, TResult extends ServerQueryResult>(
 
   return (async (input: TInput) => {
     const params = new URLSearchParams();
-    params.set("payload", serializer.serializeInput(input));
+
+    // Only set payload if input is not undefined.
+    if (input) {
+      params.set("payload", serializer.serializeInput(input));
+    }
 
     let path = `${options.basePath}/${query.id}`;
 
     if (query.type === "query") {
       path = `${path}?${params.toString()}`;
     } else {
-      fetchOptions.body = serializer.serializeInput(input);
+      if (input) {
+        fetchOptions.body = serializer.serializeInput(input);
+      }
     }
 
     const request = await fetch(path, {
