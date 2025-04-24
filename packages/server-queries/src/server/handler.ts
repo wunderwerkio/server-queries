@@ -55,18 +55,6 @@ export function createRouteHandler(
   const handleGet = async (request: NextRequest) => {
     const params = new URLSearchParams(request.url.split("?")[1]);
     const payload = params.get("payload");
-    if (!payload) {
-      mergedOptions.logger.error(
-        "Error handling server query request: No payload found in URL!",
-        request.url,
-      );
-
-      return createErrorResponse({
-        status: "400",
-        title: "Bad Request",
-        detail: "No payload found in URL!",
-      });
-    }
 
     const id = extractQueryIdFromPath(request.nextUrl.pathname);
     if (!id) {
@@ -83,9 +71,6 @@ export function createRouteHandler(
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const input = serializer.deserializeInput(payload);
-
       const query = queries.find((query) => query.id === id);
       if (!query) {
         mergedOptions.logger.error(
@@ -112,6 +97,9 @@ export function createRouteHandler(
         });
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const input = payload ? serializer.deserializeInput(payload) : undefined;
+
       const result = await query.func(input);
 
       return new Response(serializer.serializeResult(result), { status: 200 });
@@ -132,13 +120,6 @@ export function createRouteHandler(
 
   const handlePost = async (request: NextRequest) => {
     const payload = await request.text();
-    if (!payload) {
-      return createErrorResponse({
-        status: "400",
-        title: "Bad Request",
-        detail: "No payload found in request!",
-      });
-    }
 
     const id = extractQueryIdFromPath(request.nextUrl.pathname);
     if (!id) {
@@ -150,9 +131,6 @@ export function createRouteHandler(
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const input = serializer.deserializeInput(payload);
-
       const query = queries.find((query) => query.id === id);
       if (!query) {
         mergedOptions.logger.error(
@@ -178,6 +156,9 @@ export function createRouteHandler(
           detail: `Query with id ${id} is not a mutation, instead has type: ${query.type}!`,
         });
       }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const input = payload ? serializer.deserializeInput(payload) : undefined;
 
       const result = await query.func(input);
 
