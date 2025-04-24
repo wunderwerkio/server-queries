@@ -30,23 +30,23 @@ export function createCaller<TInput, TResult extends ServerQueryResult>(
   const serializer = createJsonSerializer<TInput, TResult>();
 
   return (async (input: TInput) => {
+    // Prepare URL parameters for GET requests.
     const params = new URLSearchParams();
-
-    // Only set payload if input is not undefined.
     if (input) {
       params.set("payload", serializer.serializeInput(input));
     }
 
-    let path = `${options.basePath}/${query.id}`;
+    // Build the request path.
+    const basePath = `${options.basePath}/${query.id}`;
+    const path =
+      query.type === "query" ? `${basePath}?${params.toString()}` : basePath;
 
-    if (query.type === "query") {
-      path = `${path}?${params.toString()}`;
-    } else {
-      if (input) {
-        fetchOptions.body = serializer.serializeInput(input);
-      }
+    // For POST requests, set the body if there's input.
+    if (query.type === "mutation" && input) {
+      fetchOptions.body = serializer.serializeInput(input);
     }
 
+    // Make the request with appropriate method and headers.
     const request = await fetch(path, {
       ...fetchOptions,
       method: query.type === "query" ? "GET" : "POST",
@@ -56,9 +56,10 @@ export function createCaller<TInput, TResult extends ServerQueryResult>(
       },
     });
 
-    const payload = await request.text();
-    const result = serializer.deserializeResult(payload);
+    // Get response as text.
+    const responseText = await request.text();
 
-    return result;
+    // Deserialize the JSON response.
+    return serializer.deserializeResult(responseText);
   }) as ServerQueryCaller<TInput, TResult>;
 }
