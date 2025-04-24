@@ -39,7 +39,11 @@ export function createCaller<TInput, TResult extends ServerQueryResult>(
     // Build the request path.
     const basePath = `${options.basePath}/${query.id}`;
     const path =
-      query.type === "query" ? `${basePath}?${params.toString()}` : basePath;
+      query.type === "query"
+        ? params.size > 0
+          ? `${basePath}?${params.toString()}`
+          : basePath
+        : basePath;
 
     // For POST requests, set the body if there's input.
     if (query.type === "mutation" && input) {
