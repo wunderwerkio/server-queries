@@ -1,5 +1,12 @@
 # server-queries
 
+## 0.1.5
+
+### Patch Changes
+
+- 10e175c: Do not forcefully expect a payload in the route handler
+- bdabd10: Only add ? to fetch path if at least on query param is set
+
 ## 0.1.4
 
 ### Patch Changes
