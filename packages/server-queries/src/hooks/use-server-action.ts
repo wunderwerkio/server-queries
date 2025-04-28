@@ -3,41 +3,37 @@
 import { useTransition } from "react";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
-import { useServerQueryConfig } from "../context/ServerQueryConfigProvider.hooks";
-import { createCaller } from "../lib/caller";
 import { ServerQueryResult } from "../results";
-import {
-  ExtractErr,
-  ExtractOk,
-  ServerQueryFunction,
-  ValidationError,
-} from "../types";
+import { ExtractErr, ExtractOk, ValidationError } from "../types";
 import { MutationError } from "../lib/MutationError";
-import { RetryValue, useRetryFn } from "./mutation/useRetryFn";
-import { RetryDelayValue, useRetryDelayFn } from "./mutation/useRetryDelayFn";
-import { useThrowOnErrorFn } from "./mutation/useThrowOnErrorFn";
-import { useTransitionMutate } from "./mutation/useTransitionMutate";
-import { useTransitionMutateAsync } from "./mutation/useTransitionMutateAsync";
+import { RetryValue, useRetryFn } from "./mutation/use-retry-fn";
+import {
+  RetryDelayValue,
+  useRetryDelayFn,
+} from "./mutation/use-retry-delay-fn";
+import { useThrowOnErrorFn } from "./mutation/use-throw-on-error-fn";
+import { useTransitionMutate } from "./mutation/use-transition-mutate";
+import { useTransitionMutateAsync } from "./mutation/use-transition-mutate-async";
 
 /**
- * Hook for executing server mutations with React Query.
+ * Hook for executing server actions with React Query.
  *
- * Provides a type-safe way to execute server mutations with automatic error handling,
+ * Provides a type-safe way to execute server actions with automatic error handling,
  * retries, and React transitions support.
  *
  * ### Key features:
- * - Type-safe mutation execution and error handling.
+ * - Type-safe action execution and error handling.
  * - Configurable retry behavior and delays.
  * - React transitions integration for smooth UI updates.
- * - Supports both synchronous and asynchronous mutations.
+ * - Supports both synchronous and asynchronous actions.
  */
-export function useServerMutation<
+export function useServerAction<
   TInput,
   TResult extends ServerQueryResult,
   TContext,
   TExtractErr extends ExtractErr<TResult | ValidationError>,
 >(
-  mutation: ServerQueryFunction<TInput, TResult>,
+  action: (input: TInput) => TResult | Promise<TResult>,
   {
     onError,
     onSettled,
@@ -83,7 +79,6 @@ export function useServerMutation<
       | ((firstErr: TExtractErr, errors: TExtractErr[]) => boolean);
   },
 ) {
-  const config = useServerQueryConfig();
   const [isPending, startTransition] = useTransition();
 
   // Custom retry function to support firstError and error array.
@@ -101,12 +96,10 @@ export function useServerMutation<
     TInput extends object ? TInput : void,
     TContext
   >({
-    // Custom mutationFn to call the server mutation.
+    // Custom mutationFn to call the server action.
     // Returns the error as a MutationError holding the payload.
     mutationFn: async (input: TInput extends object ? TInput : void) => {
-      const caller = createCaller(mutation, {}, config);
-
-      const result = await caller(input as TInput);
+      const result = await action(input as TInput);
       if (result.err) {
         throw new MutationError(result.val);
       }
