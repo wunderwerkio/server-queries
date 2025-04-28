@@ -24,13 +24,11 @@ export function serverMutation<
 >(
   id: string,
   schema: TSchema,
-  callback: (input: z.infer<TSchema>) => TReturn,
+  callback: (input: z.infer<TSchema>) => TReturn
 ): {
   id: string;
   type: "mutation";
-  func: (
-    input: z.infer<TSchema>,
-  ) => Promise<Awaited<TReturn> | ValidationError>;
+  func: (input: z.infer<TSchema>) => Promise<Awaited<TReturn> | ValidationError>;
 };
 
 /**
@@ -48,7 +46,7 @@ export function serverMutation<
  */
 export function serverMutation<TReturn extends PromiseLike<ServerQueryResult>>(
   id: string,
-  callback: () => TReturn,
+  callback: () => TReturn
 ): {
   id: string;
   type: "mutation";
@@ -73,7 +71,7 @@ export function serverMutation<TReturn extends PromiseLike<ServerQueryResult>>(
 export function serverMutation<TReturn extends PromiseLike<ServerQueryResult>>(
   id: string,
   schemaOrCallback: ZodSchema | (() => PromiseLike<TReturn>),
-  callback?: (data: unknown) => PromiseLike<TReturn>,
+  callback?: (data: unknown) => PromiseLike<TReturn>
 ) {
   if (typeof schemaOrCallback === "function") {
     return {
@@ -92,23 +90,26 @@ export function serverMutation<TReturn extends PromiseLike<ServerQueryResult>>(
         // eslint-disable-next-line
         console.error(
           "[Server Query] Validation failed:",
-          validationResult.error.toString(),
+          validationResult.error.toString()
         );
 
         // Properly map zod errors to the ServerQueryError format.
-        const errors = validationResult.error.errors.map((error) => ({
-          code: "validation_failed",
-          title: "Validation failed",
-          detail: error.message,
-          source: {
-            pointer: error.path.join("."),
-          },
-          meta: {
-            reason: error.code,
-            expected: "expected" in error ? error.expected : undefined,
-            received: "received" in error ? error.received : undefined,
-          },
-        }));
+        const errors = validationResult.error.errors.map(
+          (error) =>
+            ({
+              code: "validation_failed",
+              title: "Validation failed",
+              detail: error.message,
+              source: {
+                pointer: error.path.join("."),
+              },
+              meta: {
+                reason: error.code,
+                expected: "expected" in error ? error.expected : undefined,
+                received: "received" in error ? error.received : undefined,
+              },
+            })
+        );
 
         return ServerQueryErr(errors);
       }
