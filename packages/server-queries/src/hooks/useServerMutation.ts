@@ -1,86 +1,218 @@
 "use client";
 
-import { DependencyList, useCallback, useTransition } from "react";
+import { useCallback, useMemo, useTransition } from "react";
 
 import { useServerQueryConfig } from "../context/ServerQueryConfigProvider.hooks";
 import { createCaller } from "../lib/caller";
 import { ServerQueryResult } from "../results";
 import { ExtractErr, ExtractOk, ServerQueryFunction } from "../types";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
-/** Options for configuring server mutation behavior. */
-type Options<TResult extends ServerQueryResult> = {
-  /** Callback function invoked when the mutation succeeds. */
-  onSuccess?: (value: ExtractOk<TResult>) => void | Promise<void>;
-  /** Callback function invoked when the mutation fails. */
-  onError?: (
-    firstError: ExtractErr<TResult>[number],
-    errors: ExtractErr<TResult>,
-  ) => void | Promise<void>;
-};
+/** Function that determines whether to retry a mutation based on error details. */
+type RetryValue<TError> = boolean | number | ShouldRetryFunction<TError>;
 
 /**
- * Hook to execute server mutations with loading state and result handling.
+ * Function that determines whether to retry a mutation.
+ *
+ * @param failureCount - Number of failed attempts.
+ * @param firstError - First error that occurred.
+ * @param errors - Array of all errors that occurred.
+ */
+type ShouldRetryFunction<TError> = (
+  failureCount: number,
+  firstError: TError,
+  errors: TError[],
+) => boolean;
+
+/** Value that determines delay between retry attempts. */
+type RetryDelayValue<TError> = number | RetryDelayFunction<TError>;
+
+/**
+ * Function that determines delay between retry attempts.
+ *
+ * @param failureCount - Number of failed attempts.
+ * @param firstError - First error that occurred.
+ * @param errors - Array of all errors that occurred.
+ */
+type RetryDelayFunction<TError> = (
+  failureCount: number,
+  firstError: TError,
+  errors: TError[],
+) => number;
+
+/** Error thrown when a mutation fails. */
+class MutationError<TInput> extends Error {
+  /**
+   * Construct new instance.
+   */
+  constructor(
+    // The original error payload from the server mutation.
+    public readonly payload: TInput,
+  ) {
+    super("mutation error");
+  }
+}
+
+/**
+ * Hook for executing server mutations with React Query.
+ *
+ * Provides a type-safe way to execute server mutations with automatic error handling,
+ * retries, and React transitions support.
  *
  * ### Key features:
- * - Returns a tuple with mutation callback and loading state.
- * - Handles success and error states through callbacks.
- * - Provides type-safe access to mutation results.
- * - Automatically logs errors through configured logger.
- *
- * @param mutation - The server mutation to execute.
- * @param options - Configuration options for handling mutation results.
- * @param deps - Additional dependencies for the mutation callback.
- * @throws {Error} If used with a query instead of a mutation.
+ * - Type-safe mutation execution and error handling.
+ * - Configurable retry behavior and delays.
+ * - React transitions integration for smooth UI updates.
+ * - Supports both synchronous and asynchronous mutations.
  */
-export function useServerMutation<TInput, TResult extends ServerQueryResult>(
+export function useServerMutation<
+  TInput,
+  TResult extends ServerQueryResult,
+  TContext,
+  TExtractErr extends ExtractErr<TResult>,
+>(
   mutation: ServerQueryFunction<TInput, TResult>,
-  options: Options<TResult> = {},
-  deps: DependencyList = [],
+  {
+    onError,
+    onSettled,
+    throwOnError,
+    retry,
+    retryDelay,
+    ...options
+  }: Omit<
+    UseMutationOptions<
+      ExtractOk<TResult>,
+      unknown,
+      TInput,
+      TContext | undefined
+    >,
+    | "mutationFn"
+    | "onError"
+    | "onSettled"
+    | "retry"
+    | "retryDelay"
+    | "throwOnError"
+  > & {
+    onError?: (
+      firstErr: TExtractErr,
+      errors: TExtractErr[],
+      variables: TInput,
+      context: TContext | undefined,
+      // Use the same type as in the original MutationOptions.
+      // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    ) => Promise<unknown> | unknown;
+    onSettled?: (
+      data: ExtractOk<TResult> | undefined,
+      firstErr: TExtractErr | null,
+      errors: TExtractErr[],
+      variables: TInput,
+      context: TContext | undefined,
+      // Use the same type as in the original MutationOptions.
+      // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    ) => Promise<unknown> | unknown;
+    retry?: RetryValue<ExtractErr<TResult>>;
+    retryDelay?: RetryDelayValue<ExtractErr<TResult>>;
+    throwOnError?:
+      | boolean
+      | ((firstErr: TExtractErr, errors: TExtractErr[]) => boolean);
+  },
 ) {
-  const [isPending, startTransition] = useTransition();
   const config = useServerQueryConfig();
+  const [isPending, startTransition] = useTransition();
 
-  // Safety check.
-  if (mutation.type !== "mutation") {
-    throw new Error(
-      "useServerMutation can only be used with server mutations!",
-    );
-  }
+  // Custom retry function to support firstError and error array.
+  const retryFn = useMemo(() => {
+    if (typeof retry === "function") {
+      return (failureCount: number, error: MutationError<TExtractErr[]>) =>
+        retry(failureCount, error.payload[0], error.payload);
+    }
 
-  const callback = useCallback(
-    (input: TInput) => {
+    return retry;
+  }, [retry]);
+
+  // Custom retryDelay function to support firstError and error array.
+  const retryDelayFn = useMemo(() => {
+    if (typeof retryDelay === "function") {
+      return (failureCount: number, error: MutationError<TExtractErr[]>) =>
+        retryDelay(failureCount, error.payload[0], error.payload);
+    }
+
+    return retryDelay;
+  }, [retryDelay]);
+
+  // Custom throwOnError function to support firstError and error array.
+  const throwOnErrorFn = useMemo(() => {
+    if (typeof throwOnError === "function") {
+      return (error: MutationError<TExtractErr[]>) =>
+        throwOnError(error.payload[0], error.payload);
+    }
+
+    return throwOnError;
+  }, [throwOnError]);
+
+  const result = useMutation<
+    ExtractOk<TResult>,
+    MutationError<TExtractErr[]>,
+    TInput,
+    TContext
+  >({
+    // Custom mutationFn to call the server mutation.
+    // Returns the error as a MutationError holding the payload.
+    mutationFn: async (input: TInput) => {
       const caller = createCaller(mutation, {}, config);
 
+      const result = await caller(input);
+      if (result.err) {
+        throw new MutationError(result.val);
+      }
+
+      return result.val as ExtractOk<TResult>;
+    },
+    // Custom onError function to support firstError and error array.
+    onError(error, variables, context) {
+      return onError?.(error.payload[0], error.payload, variables, context);
+    },
+    // Custom onSettled function to support firstError and error array.
+    onSettled(data, error, variables, context) {
+      const firstError = error ? error.payload[0] : null;
+      const errors = error ? error.payload : [];
+
+      return onSettled?.(data, firstError, errors, variables, context);
+    },
+    retry: retryFn,
+    retryDelay: retryDelayFn,
+    throwOnError: throwOnErrorFn,
+    ...options,
+  });
+
+  // Wrap the mutate function with startTransition
+  const transitionMutate = useCallback(
+    (variables: TInput) => {
+      startTransition(() => {
+        result.mutate(variables, options);
+      });
+    },
+    [result, options, startTransition],
+  );
+
+  // Also provide an async version
+  const transitionMutateAsync = useCallback(
+    (variables: TInput) => {
       return new Promise<ExtractOk<TResult>>((resolve, reject) => {
-        startTransition(async () => {
-          // Do nothing if already pending.
-          if (isPending) return;
-
-          const result = await caller(input);
-
-          if (result.ok) {
-            await options.onSuccess?.(result.val as ExtractOk<TResult>);
-            resolve(result.val as ExtractOk<TResult>);
-          } else {
-            config.logger.error(
-              `Error fetching data for server mutation (${mutation.id}):`,
-              result.val[0].title,
-              result.val[0].detail,
-            );
-
-            await options.onError?.(
-              result.val[0],
-              result.val as ExtractErr<TResult>,
-            );
-            // eslint-disable-next-line
-            reject(result.val as ExtractErr<TResult>);
-          }
+        startTransition(() => {
+          result.mutateAsync(variables, options).then(resolve).catch(reject);
         });
       });
     },
-    // eslint-disable-next-line
-    [startTransition, mutation, isPending, options, ...deps],
+    [result, options, startTransition],
   );
 
-  return [callback, isPending] as const;
+  return {
+    ...result,
+    isTransitionPending: isPending,
+    mutateNoTransition: result.mutate,
+    mutateAsyncNoTransition: result.mutateAsync,
+    mutate: transitionMutate,
+    mutateAsync: transitionMutateAsync,
+  };
 }
