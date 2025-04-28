@@ -37,7 +37,7 @@ export type ServerQueryResult = ServerQueryResultOk | ServerQueryResultErr;
  *
  * @param val - The success payload. Defaults to undefined if not set.
  */
-export const ServerQueryOk = <T extends ServerQueryPayload>(val: T) => {
+export const ServerQueryOk = <const T extends ServerQueryPayload>(val: T) => {
   return {
     ok: true,
     err: false,
@@ -52,7 +52,9 @@ export type ServerQueryResultOk = ReturnType<typeof ServerQueryOk>;
  *
  * @param err - The error.
  */
-export const ServerQueryErr = <T extends ServerQueryError>(err: T | T[]) => {
+export const ServerQueryErr = <const T extends ServerQueryError>(
+  err: T | T[]
+) => {
   const val = Array.isArray(err) ? err : [err];
 
   return {

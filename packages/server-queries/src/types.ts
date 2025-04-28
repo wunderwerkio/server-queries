@@ -73,6 +73,14 @@ export type ServerQueryFunction<TInput, TResult extends ServerQueryResult> = {
     : () => Promise<ValidationError | TResult>;
 };
 
+/** Server action function definition. */
+export type ServerActionFunction<
+  TInput,
+  TResult extends ServerQueryResult,
+> = TInput extends object
+  ? (input: TInput) => Promise<ValidationError | TResult>
+  : () => Promise<ValidationError | TResult>;
+
 /** Function for executing server queries/mutations. */
 export type ServerQueryCaller<
   TInput,
@@ -109,7 +117,9 @@ export type ExtractErr<T> = T extends {
   readonly err: true;
   readonly val: infer V;
 }
-  ? V
+  ? V extends Array<infer U>
+    ? U
+    : V
   : never;
 
 /** Function that determines whether to retry a mutation based on error details. */
