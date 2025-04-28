@@ -5,7 +5,9 @@
   "scripts": {
     "build": "tsup",
     "lint": "eslint src",
-    "typecheck": "tsc --project ./tsconfig.json --noEmit"
+    "typecheck": "pnpm run '/(typecheck:.*)/'",
+    "typecheck:src": "tsc --project ./tsconfig.json",
+    "typecheck:tests": "tsc --project ./tsconfig.tests.json"
   },
   "exports": {
     "./client": {

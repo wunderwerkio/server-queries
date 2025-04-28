@@ -1,0 +1,8 @@
+{
+  "extends": "typescript-config/react.json",
+  "include": ["tests/**/*.ts"],
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "strict": true
+  }
+}
