@@ -197,7 +197,7 @@ function isInputMutationError(
         code: "too_young";
         title: string;
       }
-    | ValidationError["val"][number]
+    | ValidationError["val"][number],
 ): void {}
 
 function isInputLessMutationError(
@@ -206,5 +206,5 @@ function isInputLessMutationError(
         code: "random_fail";
         title: string;
       }
-    | ValidationError["val"][number]
+    | ValidationError["val"][number],
 ): void {}

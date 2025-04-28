@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { ExtractOk } from "../types";
+import { ExtractOk } from "../../types";
 
 /**
  * Hook that wraps a mutation function with React's startTransition.
@@ -13,25 +13,20 @@ import { ExtractOk } from "../types";
  * - Type-safe mutation execution.
  *
  * @param mutateAsync - The async mutation function to wrap.
- * @param options - Options to pass to the mutation function.
  * @param startTransition - React's startTransition function.
  */
-export const useTransitionMutateAsync = <TInput, TResult, TOptions>(
-  mutateAsync: (
-    variables: TInput,
-    options: TOptions
-  ) => Promise<ExtractOk<TResult>>,
+export const useTransitionMutateAsync = <TInput, TResult>(
+  mutateAsync: (variables: TInput) => Promise<ExtractOk<TResult>>,
   startTransition: (fn: () => void) => void,
-  options: TOptions
 ) => {
   return useCallback(
     (variables: TInput) => {
       return new Promise<ExtractOk<TResult>>((resolve, reject) => {
         startTransition(() => {
-          mutateAsync(variables, options).then(resolve).catch(reject);
+          mutateAsync(variables).then(resolve).catch(reject);
         });
       });
     },
-    [mutateAsync, options, startTransition]
+    [mutateAsync, startTransition],
   );
 };
