@@ -1,5 +1,15 @@
 # server-queries
 
+## 0.3.0
+
+### Minor Changes
+
+- e573acb: BREAKING: Correct implementation of adding mutate options to mutate function calls to reflect the original implementation in useMutation
+
+### Patch Changes
+
+- d5cd9d5: Improve types of useServerMutation; allow call without schema with no arguments to mutation
+
 ## 0.2.0
 
 ### Minor Changes
