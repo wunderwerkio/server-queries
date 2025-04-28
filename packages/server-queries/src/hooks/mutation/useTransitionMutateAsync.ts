@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { ExtractOk } from "../../types";
+import { MutateOptions } from "@tanstack/react-query";
 
 /**
  * Hook that wraps a mutation function with React's startTransition.
@@ -15,15 +15,21 @@ import { ExtractOk } from "../../types";
  * @param mutateAsync - The async mutation function to wrap.
  * @param startTransition - React's startTransition function.
  */
-export const useTransitionMutateAsync = <TInput, TResult>(
-  mutateAsync: (variables: TInput) => Promise<ExtractOk<TResult>>,
+export const useTransitionMutateAsync = <TOk, TErr, TInput, TContext>(
+  mutateAsync: (
+    variables: TInput,
+    options?: MutateOptions<TOk, TErr, TInput, TContext>,
+  ) => Promise<TOk>,
   startTransition: (fn: () => void) => void,
 ) => {
   return useCallback(
-    (variables: TInput) => {
-      return new Promise<ExtractOk<TResult>>((resolve, reject) => {
+    (
+      variables: TInput,
+      options?: MutateOptions<TOk, TErr, TInput, TContext>,
+    ) => {
+      return new Promise<TOk>((resolve, reject) => {
         startTransition(() => {
-          mutateAsync(variables).then(resolve).catch(reject);
+          mutateAsync(variables, options).then(resolve).catch(reject);
         });
       });
     },

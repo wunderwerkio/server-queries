@@ -1,3 +1,4 @@
+import { MutateOptions } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 /**
@@ -14,15 +15,21 @@ import { useCallback } from "react";
  * @param mutateFn - The mutation function to wrap.
  * @param startTransition - React's startTransition function.
  */
-export function useTransitionMutate<TInput>(
-  mutateFn: (variables: TInput) => void,
+export function useTransitionMutate<TOk, TErr, TInput, TContext>(
+  mutateFn: (
+    variables: TInput,
+    options?: MutateOptions<TOk, TErr, TInput, TContext>,
+  ) => void,
   startTransition: (fn: () => void) => void,
 ) {
   // Wrap the mutate function with startTransition
   return useCallback(
-    (variables: TInput) => {
+    (
+      variables: TInput,
+      options?: MutateOptions<TOk, TErr, TInput, TContext>,
+    ) => {
       startTransition(() => {
-        mutateFn(variables);
+        mutateFn(variables, options);
       });
     },
     [mutateFn, startTransition],

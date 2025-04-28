@@ -169,19 +169,63 @@ const {
   },
 });
 
-mutateInputMutation({ name: "John", age: 20 });
+mutateInputMutation(
+  { name: "John", age: 20 },
+  {
+    onSuccess(result) {
+      // `ok` must be a property on result.
+      console.log(result.ok);
+    },
+    onError(error) {
+      isInputMutationError(error.payload[0]);
+    },
+  },
+);
 // @ts-expect-error Wrong payload type.
 mutateInputMutation({ wrong: "John" });
 
-mutateAsyncInputMutation({ name: "John", age: 20 });
+mutateAsyncInputMutation(
+  { name: "John", age: 20 },
+  {
+    onSuccess(result) {
+      // `ok` must be a property on result.
+      console.log(result.ok);
+    },
+    onError(error) {
+      isInputMutationError(error.payload[0]);
+    },
+  },
+);
 // @ts-expect-error Wrong payload type.
 mutateAsyncInputMutation({ wrong: "John" });
 
-mutateNoTransitionInputMutation({ name: "John", age: 20 });
+mutateNoTransitionInputMutation(
+  { name: "John", age: 20 },
+  {
+    onSuccess(result) {
+      // `ok` must be a property on result.
+      console.log(result.ok);
+    },
+    onError(error) {
+      isInputMutationError(error.payload[0]);
+    },
+  },
+);
 // @ts-expect-error Wrong payload type.
 mutateNoTransitionInputMutation({ wrong: "John" });
 
-mutateAsyncNoTransitionInputMutation({ name: "John", age: 20 });
+mutateAsyncNoTransitionInputMutation(
+  { name: "John", age: 20 },
+  {
+    onSuccess(result) {
+      // `ok` must be a property on result.
+      console.log(result.ok);
+    },
+    onError(error) {
+      isInputMutationError(error.payload[0]);
+    },
+  },
+);
 // @ts-expect-error Wrong payload type.
 mutateAsyncNoTransitionInputMutation({ wrong: "John" });
 
