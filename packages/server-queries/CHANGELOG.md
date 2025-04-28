@@ -1,5 +1,15 @@
 # server-queries
 
+## 0.4.0
+
+### Minor Changes
+
+- a9454e5: Add support for server actions, very similar to server mutation
+
+### Patch Changes
+
+- 1383b69: Ensure consistent file names
+
 ## 0.3.0
 
 ### Minor Changes
