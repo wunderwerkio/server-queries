@@ -5,53 +5,15 @@ import { useCallback, useMemo, useTransition } from "react";
 import { useServerQueryConfig } from "../context/ServerQueryConfigProvider.hooks";
 import { createCaller } from "../lib/caller";
 import { ServerQueryResult } from "../results";
-import { ExtractErr, ExtractOk, ServerQueryFunction } from "../types";
+import {
+  ExtractErr,
+  ExtractOk,
+  RetryDelayValue,
+  RetryValue,
+  ServerQueryFunction,
+} from "../types";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-
-/** Function that determines whether to retry a mutation based on error details. */
-type RetryValue<TError> = boolean | number | ShouldRetryFunction<TError>;
-
-/**
- * Function that determines whether to retry a mutation.
- *
- * @param failureCount - Number of failed attempts.
- * @param firstError - First error that occurred.
- * @param errors - Array of all errors that occurred.
- */
-type ShouldRetryFunction<TError> = (
-  failureCount: number,
-  firstError: TError,
-  errors: TError[],
-) => boolean;
-
-/** Value that determines delay between retry attempts. */
-type RetryDelayValue<TError> = number | RetryDelayFunction<TError>;
-
-/**
- * Function that determines delay between retry attempts.
- *
- * @param failureCount - Number of failed attempts.
- * @param firstError - First error that occurred.
- * @param errors - Array of all errors that occurred.
- */
-type RetryDelayFunction<TError> = (
-  failureCount: number,
-  firstError: TError,
-  errors: TError[],
-) => number;
-
-/** Error thrown when a mutation fails. */
-class MutationError<TInput> extends Error {
-  /**
-   * Construct new instance.
-   */
-  constructor(
-    // The original error payload from the server mutation.
-    public readonly payload: TInput,
-  ) {
-    super("mutation error");
-  }
-}
+import { MutationError } from "../lib/MutationError";
 
 /**
  * Hook for executing server mutations with React Query.
@@ -97,7 +59,7 @@ export function useServerMutation<
       firstErr: TExtractErr,
       errors: TExtractErr[],
       variables: TInput,
-      context: TContext | undefined,
+      context: TContext | undefined
       // Use the same type as in the original MutationOptions.
       // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     ) => Promise<unknown> | unknown;
@@ -106,7 +68,7 @@ export function useServerMutation<
       firstErr: TExtractErr | null,
       errors: TExtractErr[],
       variables: TInput,
-      context: TContext | undefined,
+      context: TContext | undefined
       // Use the same type as in the original MutationOptions.
       // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     ) => Promise<unknown> | unknown;
@@ -115,7 +77,7 @@ export function useServerMutation<
     throwOnError?:
       | boolean
       | ((firstErr: TExtractErr, errors: TExtractErr[]) => boolean);
-  },
+  }
 ) {
   const config = useServerQueryConfig();
   const [isPending, startTransition] = useTransition();
@@ -192,7 +154,7 @@ export function useServerMutation<
         result.mutate(variables, options);
       });
     },
-    [result, options, startTransition],
+    [result, options, startTransition]
   );
 
   // Also provide an async version
@@ -204,7 +166,7 @@ export function useServerMutation<
         });
       });
     },
-    [result, options, startTransition],
+    [result, options, startTransition]
   );
 
   return {
