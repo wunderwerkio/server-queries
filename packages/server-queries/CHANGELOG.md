@@ -1,5 +1,11 @@
 # server-queries
 
+## 0.2.0
+
+### Minor Changes
+
+- 81c1ebb: BREAKING: New implementation of useServerMutation hook that wraps the useMutation hook from react-query
+
 ## 0.1.5
 
 ### Patch Changes
