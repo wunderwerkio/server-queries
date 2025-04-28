@@ -11,6 +11,7 @@ import {
   RetryDelayValue,
   RetryValue,
   ServerQueryFunction,
+  ValidationError,
 } from "../types";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { MutationError } from "../lib/MutationError";
@@ -31,7 +32,7 @@ export function useServerMutation<
   TInput,
   TResult extends ServerQueryResult,
   TContext,
-  TExtractErr extends ExtractErr<TResult>,
+  TExtractErr extends ExtractErr<TResult | ValidationError>,
 >(
   mutation: ServerQueryFunction<TInput, TResult>,
   {
@@ -45,7 +46,7 @@ export function useServerMutation<
     UseMutationOptions<
       ExtractOk<TResult>,
       unknown,
-      TInput,
+      TInput extends object ? TInput : void,
       TContext | undefined
     >,
     | "mutationFn"
@@ -58,7 +59,7 @@ export function useServerMutation<
     onError?: (
       firstErr: TExtractErr,
       errors: TExtractErr[],
-      variables: TInput,
+      variables: TInput extends object ? TInput : void,
       context: TContext | undefined
       // Use the same type as in the original MutationOptions.
       // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
@@ -67,13 +68,13 @@ export function useServerMutation<
       data: ExtractOk<TResult> | undefined,
       firstErr: TExtractErr | null,
       errors: TExtractErr[],
-      variables: TInput,
+      variables: TInput extends object ? TInput : void,
       context: TContext | undefined
       // Use the same type as in the original MutationOptions.
       // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     ) => Promise<unknown> | unknown;
-    retry?: RetryValue<ExtractErr<TResult>>;
-    retryDelay?: RetryDelayValue<ExtractErr<TResult>>;
+    retry?: RetryValue<TExtractErr>;
+    retryDelay?: RetryDelayValue<TExtractErr>;
     throwOnError?:
       | boolean
       | ((firstErr: TExtractErr, errors: TExtractErr[]) => boolean);
@@ -115,15 +116,15 @@ export function useServerMutation<
   const result = useMutation<
     ExtractOk<TResult>,
     MutationError<TExtractErr[]>,
-    TInput,
+    TInput extends object ? TInput : void,
     TContext
   >({
     // Custom mutationFn to call the server mutation.
     // Returns the error as a MutationError holding the payload.
-    mutationFn: async (input: TInput) => {
+    mutationFn: async (input: TInput extends object ? TInput : void) => {
       const caller = createCaller(mutation, {}, config);
 
-      const result = await caller(input);
+      const result = await caller(input as TInput);
       if (result.err) {
         throw new MutationError(result.val);
       }
@@ -149,7 +150,7 @@ export function useServerMutation<
 
   // Wrap the mutate function with startTransition
   const transitionMutate = useCallback(
-    (variables: TInput) => {
+    (variables: TInput extends object ? TInput : void) => {
       startTransition(() => {
         result.mutate(variables, options);
       });
@@ -159,7 +160,7 @@ export function useServerMutation<
 
   // Also provide an async version
   const transitionMutateAsync = useCallback(
-    (variables: TInput) => {
+    (variables: TInput extends object ? TInput : void) => {
       return new Promise<ExtractOk<TResult>>((resolve, reject) => {
         startTransition(() => {
           result.mutateAsync(variables, options).then(resolve).catch(reject);
