@@ -16,7 +16,7 @@ export class MutationError<TInput> extends Error {
    */
   constructor(
     // The original error payload from the server mutation.
-    public readonly payload: TInput
+    public readonly payload: TInput,
   ) {
     super("mutation error");
   }

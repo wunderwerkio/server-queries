@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useTransition } from "react";
+import { useTransition } from "react";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 import { useServerQueryConfig } from "../context/ServerQueryConfigProvider.hooks";
 import { createCaller } from "../lib/caller";
@@ -8,13 +9,15 @@ import { ServerQueryResult } from "../results";
 import {
   ExtractErr,
   ExtractOk,
-  RetryDelayValue,
-  RetryValue,
   ServerQueryFunction,
   ValidationError,
 } from "../types";
-import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { MutationError } from "../lib/MutationError";
+import { RetryValue, useRetryFn } from "./mutation/useRetryFn";
+import { RetryDelayValue, useRetryDelayFn } from "./mutation/useRetryDelayFn";
+import { useThrowOnErrorFn } from "./mutation/useThrowOnErrorFn";
+import { useTransitionMutate } from "./mutation/useTransitionMutate";
+import { useTransitionMutateAsync } from "./mutation/useTransitionMutateAsync";
 
 /**
  * Hook for executing server mutations with React Query.
@@ -60,7 +63,7 @@ export function useServerMutation<
       firstErr: TExtractErr,
       errors: TExtractErr[],
       variables: TInput extends object ? TInput : void,
-      context: TContext | undefined
+      context: TContext | undefined,
       // Use the same type as in the original MutationOptions.
       // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     ) => Promise<unknown> | unknown;
@@ -69,7 +72,7 @@ export function useServerMutation<
       firstErr: TExtractErr | null,
       errors: TExtractErr[],
       variables: TInput extends object ? TInput : void,
-      context: TContext | undefined
+      context: TContext | undefined,
       // Use the same type as in the original MutationOptions.
       // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     ) => Promise<unknown> | unknown;
@@ -78,40 +81,19 @@ export function useServerMutation<
     throwOnError?:
       | boolean
       | ((firstErr: TExtractErr, errors: TExtractErr[]) => boolean);
-  }
+  },
 ) {
   const config = useServerQueryConfig();
   const [isPending, startTransition] = useTransition();
 
   // Custom retry function to support firstError and error array.
-  const retryFn = useMemo(() => {
-    if (typeof retry === "function") {
-      return (failureCount: number, error: MutationError<TExtractErr[]>) =>
-        retry(failureCount, error.payload[0], error.payload);
-    }
-
-    return retry;
-  }, [retry]);
+  const retryFn = useRetryFn(retry);
 
   // Custom retryDelay function to support firstError and error array.
-  const retryDelayFn = useMemo(() => {
-    if (typeof retryDelay === "function") {
-      return (failureCount: number, error: MutationError<TExtractErr[]>) =>
-        retryDelay(failureCount, error.payload[0], error.payload);
-    }
-
-    return retryDelay;
-  }, [retryDelay]);
+  const retryDelayFn = useRetryDelayFn(retryDelay);
 
   // Custom throwOnError function to support firstError and error array.
-  const throwOnErrorFn = useMemo(() => {
-    if (typeof throwOnError === "function") {
-      return (error: MutationError<TExtractErr[]>) =>
-        throwOnError(error.payload[0], error.payload);
-    }
-
-    return throwOnError;
-  }, [throwOnError]);
+  const throwOnErrorFn = useThrowOnErrorFn(throwOnError);
 
   const result = useMutation<
     ExtractOk<TResult>,
@@ -148,26 +130,13 @@ export function useServerMutation<
     ...options,
   });
 
-  // Wrap the mutate function with startTransition
-  const transitionMutate = useCallback(
-    (variables: TInput extends object ? TInput : void) => {
-      startTransition(() => {
-        result.mutate(variables, options);
-      });
-    },
-    [result, options, startTransition]
-  );
+  // Wrap the mutate function with startTransition.
+  const transitionMutate = useTransitionMutate(result.mutate, startTransition);
 
-  // Also provide an async version
-  const transitionMutateAsync = useCallback(
-    (variables: TInput extends object ? TInput : void) => {
-      return new Promise<ExtractOk<TResult>>((resolve, reject) => {
-        startTransition(() => {
-          result.mutateAsync(variables, options).then(resolve).catch(reject);
-        });
-      });
-    },
-    [result, options, startTransition]
+  // Also provide an async version.
+  const transitionMutateAsync = useTransitionMutateAsync(
+    result.mutateAsync,
+    startTransition,
   );
 
   return {

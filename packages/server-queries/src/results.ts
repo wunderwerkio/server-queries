@@ -53,7 +53,7 @@ export type ServerQueryResultOk = ReturnType<typeof ServerQueryOk>;
  * @param err - The error.
  */
 export const ServerQueryErr = <const T extends ServerQueryError>(
-  err: T | T[]
+  err: T | T[],
 ) => {
   const val = Array.isArray(err) ? err : [err];
 

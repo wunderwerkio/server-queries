@@ -121,35 +121,3 @@ export type ExtractErr<T> = T extends {
     ? U
     : V
   : never;
-
-/** Function that determines whether to retry a mutation based on error details. */
-export type RetryValue<TError> = boolean | number | ShouldRetryFunction<TError>;
-
-/**
- * Function that determines whether to retry a mutation.
- *
- * @param failureCount - Number of failed attempts.
- * @param firstError - First error that occurred.
- * @param errors - Array of all errors that occurred.
- */
-export type ShouldRetryFunction<TError> = (
-  failureCount: number,
-  firstError: TError,
-  errors: TError[]
-) => boolean;
-
-/** Value that determines delay between retry attempts. */
-export type RetryDelayValue<TError> = number | RetryDelayFunction<TError>;
-
-/**
- * Function that determines delay between retry attempts.
- *
- * @param failureCount - Number of failed attempts.
- * @param firstError - First error that occurred.
- * @param errors - Array of all errors that occurred.
- */
-export type RetryDelayFunction<TError> = (
-  failureCount: number,
-  firstError: TError,
-  errors: TError[]
-) => number;
