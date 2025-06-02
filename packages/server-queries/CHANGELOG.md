@@ -1,5 +1,11 @@
 # server-queries
 
+## 0.5.1
+
+### Patch Changes
+
+- 4c72cb7: Fix invalid return of serverAction factory function if no schema is supplied
+
 ## 0.5.0
 
 ### Minor Changes
