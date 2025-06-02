@@ -84,7 +84,7 @@ export function useServerMutation<
     throwOnError?:
       | boolean
       | ((firstErr: TExtractErr, errors: TExtractErr[]) => boolean);
-  },
+  } = {},
 ) {
   const config = useServerQueryConfig();
   const [isPending, startTransition] = useTransition();
