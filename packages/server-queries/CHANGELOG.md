@@ -1,5 +1,11 @@
 # server-queries
 
+## 0.5.0
+
+### Minor Changes
+
+- a32c54a: Make options argument of `useServerAction` and `useServerMutation` hooks optional
+
 ## 0.4.0
 
 ### Minor Changes
