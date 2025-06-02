@@ -77,7 +77,7 @@ export function useServerAction<
     throwOnError?:
       | boolean
       | ((firstErr: TExtractErr, errors: TExtractErr[]) => boolean);
-  },
+  } = {},
 ) {
   const [isPending, startTransition] = useTransition();
 
