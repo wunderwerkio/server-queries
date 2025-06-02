@@ -60,7 +60,7 @@ export function serverAction<TReturn extends PromiseLike<ServerQueryResult>>(
   callback?: (data: unknown) => PromiseLike<TReturn>,
 ) {
   if (typeof schemaOrCallback === "function") {
-    return schemaOrCallback();
+    return () => schemaOrCallback();
   }
 
   return (input: unknown) => {
