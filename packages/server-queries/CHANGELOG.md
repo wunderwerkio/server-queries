@@ -1,5 +1,11 @@
 # server-queries
 
+## 0.5.2
+
+### Patch Changes
+
+- 3ae23ed: Support browsers not implementing URLSearchParams.prototype.size
+
 ## 0.5.1
 
 ### Patch Changes
