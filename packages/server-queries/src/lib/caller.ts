@@ -36,11 +36,18 @@ export function createCaller<TInput, TResult extends ServerQueryResult>(
       params.set("payload", serializer.serializeInput(input));
     }
 
+    // More sophisticated way to check if there are params,
+    // to support older browsers, which don't have the size property.
+    const hasParams =
+      "size" in URLSearchParams.prototype
+        ? params.size > 0
+        : params.keys().next().done === false;
+
     // Build the request path.
     const basePath = `${options.basePath}/${query.id}`;
     const path =
       query.type === "query"
-        ? params.size > 0
+        ? hasParams
           ? `${basePath}?${params.toString()}`
           : basePath
         : basePath;
