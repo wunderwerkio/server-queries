@@ -1,5 +1,11 @@
 # server-queries
 
+## 0.5.3
+
+### Patch Changes
+
+- de80306: Make sure that error.payload[0] is safely accessed
+
 ## 0.5.2
 
 ### Patch Changes
