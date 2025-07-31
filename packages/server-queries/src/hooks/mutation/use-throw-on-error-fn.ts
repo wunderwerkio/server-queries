@@ -22,7 +22,7 @@ export function useThrowOnErrorFn<TExtractErr>(
   return useMemo(() => {
     if (typeof throwOnError === "function") {
       return (error: MutationError<TExtractErr[]>) =>
-        throwOnError(error.payload[0], error.payload);
+        throwOnError(error.payload?.[0], error.payload);
     }
 
     return throwOnError;

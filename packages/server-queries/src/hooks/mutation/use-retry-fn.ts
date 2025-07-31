@@ -33,7 +33,7 @@ export const useRetryFn = <TExtractErr>(retry?: RetryValue<TExtractErr>) => {
   return useMemo(() => {
     if (typeof retry === "function") {
       return (failureCount: number, error: MutationError<TExtractErr[]>) =>
-        retry(failureCount, error.payload[0], error.payload);
+        retry(failureCount, error.payload?.[0], error.payload);
     }
 
     return retry;
