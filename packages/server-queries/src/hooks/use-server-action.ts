@@ -108,11 +108,11 @@ export function useServerAction<
     },
     // Custom onError function to support firstError and error array.
     onError(error, variables, context) {
-      return onError?.(error.payload[0], error.payload, variables, context);
+      return onError?.(error.payload?.[0], error.payload, variables, context);
     },
     // Custom onSettled function to support firstError and error array.
     onSettled(data, error, variables, context) {
-      const firstError = error ? error.payload[0] : null;
+      const firstError = error ? error.payload?.[0] : null;
       const errors = error ? error.payload : [];
 
       return onSettled?.(data, firstError, errors, variables, context);

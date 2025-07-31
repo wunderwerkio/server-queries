@@ -37,7 +37,7 @@ export const useRetryDelayFn = <TExtractErr>(
   return useMemo(() => {
     if (typeof retryDelay === "function") {
       return (failureCount: number, error: MutationError<TExtractErr[]>) =>
-        retryDelay(failureCount, error.payload[0], error.payload);
+        retryDelay(failureCount, error.payload?.[0], error.payload);
     }
 
     return retryDelay;
