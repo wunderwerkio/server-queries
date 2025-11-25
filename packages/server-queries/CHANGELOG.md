@@ -1,5 +1,11 @@
 # server-queries
 
+## 0.5.4
+
+### Patch Changes
+
+- ef659bf: Improve upstream message of MutationError
+
 ## 0.5.3
 
 ### Patch Changes
