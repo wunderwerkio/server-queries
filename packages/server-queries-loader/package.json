@@ -21,7 +21,7 @@
     "tsup": "^8.4.0",
     "typescript": "^5.8.2",
     "typescript-config": "workspace:*",
-    "webpack": "^5.99.6"
+    "webpack": "^5.104.1"
   },
   "files": [
     "README.md",
